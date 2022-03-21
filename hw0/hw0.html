@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#info {
+	position: absolute;
+	top: 3px;
+	width: 100%;
+	padding: 10px;
+	text-align: center;
+	font-size: 28px;
+	color: #B87070;
+}
+
+body {
+	overflow: hidden;
+}
+
+#toggle { 
+	background-color: #B87070;
+	opacity: 0.6;
+	background-repeat: no-repeat; 
+	border: none; 
+	cursor: pointer; 
+	overflow: hidden; 
+} 
+
+</style>
+</head>
+
+<body>
+<div id="info">Homework0 - Thomas the Tank Engine OBJ<br>
+<button id="toggle" style="width:15%">Turn</button>
+</div>
+<script src="https://threejs.org/build/three.min.js"></script>
+<script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="https://raw.githack.com/mrdoob/three.js/dev/examples/js/loaders/MTLLoader.js"></script>
+<script src="https://raw.githack.com/mrdoob/three.js/dev/examples/js/loaders/OBJLoader.js"></script>
+
+<script>
+var renderer, scene, camera;
+var controls, cube;
+var angle = 0;
+var train;
+var clock;
+var turn = false;
+
+init();
+animate();
+
+$("#toggle").click(function() {
+  turn = !turn;
+  // change button name
+  if (turn)  // ... is turning 
+    $("#toggle").text ('Stop');
+  else
+	$("#toggle").text ('Turn');
+});
+
+function readModel (targetSize=3) {
+
+	var onProgress = function(xhr) {
+		if (xhr.lengthComputable) {
+			var percentComplete = xhr.loaded / xhr.total * 100;
+			console.log(Math.round(percentComplete, 2) + '% downloaded');
+		}
+	};
+
+	var onError = function(xhr) {};
+
+	var mtlLoader = new THREE.MTLLoader();
+	mtlLoader.setPath('Thomas/');
+	mtlLoader.load('thomas.mtl', function(materials) {
+
+	materials.preload();
+
+	var objLoader = new THREE.OBJLoader();
+	objLoader.setMaterials(materials);
+	objLoader.setPath('Thomas/');
+	objLoader.load('thomas.obj', function(object) {
+		let theObject =  unitize (object, targetSize);
+		//theObject.add ( new THREE.BoxHelper (theObject) )
+		theObject.name = 'OBJ';
+		theObject.setRotationFromEuler (new THREE.Euler (0, 3.1415/2*3, 0, 'XYZ'))
+		train = theObject;
+		
+		scene.add (train);
+	}, onProgress, onError);
+
+	});
+	
+}
+
+function unitize (object, targetSize) {  
+	
+	// find bounding box of 'object'
+	var box3 = new THREE.Box3();
+	box3.setFromObject (object);
+	var size = new THREE.Vector3();
+	size.subVectors (box3.max, box3.min);
+	var center = new THREE.Vector3();
+	center.addVectors(box3.max, box3.min).multiplyScalar (0.5);
+	
+	console.log ('center: ' + center.x + ', '+center.y + ', '+center.z );
+	console.log ('size: ' + size.x + ', ' +  size.y + ', '+size.z );
+	
+	// uniform scaling according to objSize
+	var objSize = Math.max (size.x, size.y, size.z);
+	var scaleSet = targetSize/objSize;
+				
+	var theObject =  new THREE.Object3D();
+	theObject.add (object);
+	object.scale.set (scaleSet, scaleSet, scaleSet);
+	object.position.set (-center.x*scaleSet, -center.y*scaleSet, -center.z*scaleSet);
+	
+	return theObject;
+			
+}
+
+function makeTrack() {
+	
+	var cylinder1 = new THREE.Shape();
+	cylinder1.moveTo(8.3, 8.3);
+	cylinder1.absarc(8.3, 8.3, 8.3, 0, Math.PI*2);
+	var holeC1 = new THREE.Path();
+	holeC1.moveTo(8.3, 8.3);
+	holeC1.absarc(8.3, 8.3, 8.2, 0, Math.PI*2);
+	cylinder1.holes.push(holeC1);
+	var extrudeC1 = {
+		steps: 1,
+		depth: 0.1,
+		curveSegments: 150,
+		bevelEnabled: false,
+	};
+	var geometryC1 = new THREE.ExtrudeGeometry(cylinder1, extrudeC1);
+	var materialC1 = new THREE.MeshLambertMaterial({
+		color: 0x3C3C3C
+	});
+	var meshC1 = new THREE.Mesh(geometryC1, materialC1);
+	meshC1.rotation.x = Math.PI/2;
+	meshC1.position.set (-8.3, 0.1, -8.3);
+	scene.add(meshC1);
+	
+	var cylinder2 = new THREE.Shape();
+	cylinder2.moveTo(7.9, 7.9);
+	cylinder2.absarc(7.9, 7.9, 7.9, 0, Math.PI*2);
+	var holeC2 = new THREE.Path();
+	holeC2.moveTo(7.9, 7.9);
+	holeC2.absarc(7.9, 7.9, 7.8, 0, Math.PI*2);
+	cylinder2.holes.push(holeC2);
+	var extrudeC2 = {
+		steps: 1,
+		depth: 0.1,
+		curveSegments: 150,
+		bevelEnabled: false,
+	};
+	var geometryC2 = new THREE.ExtrudeGeometry(cylinder2, extrudeC2);
+	var materialC2 = new THREE.MeshLambertMaterial({
+		color: 0x3C3C3C
+	});
+	var meshC2 = new THREE.Mesh(geometryC2, materialC2);
+	meshC2.rotation.x = Math.PI/2;
+	meshC2.position.set (-7.9, 0.1, -7.9);
+	scene.add(meshC2);
+	
+	var cube = [];
+	var geometry = new THREE.BoxGeometry( 0.8, 0.05, 0.1);
+	var material = new THREE.MeshLambertMaterial( {color: 0x3C3C3C} );
+	for(var i=0, cubeAngle = 0; i<63; i++){
+		cube[i] = new THREE.Mesh(geometry, material);
+		cube[i].position.set(8.05*Math.cos(cubeAngle), 0.025, 8.05*Math.sin(cubeAngle));
+		cube[i].rotation.y = -cubeAngle;
+		scene.add(cube[i]);
+		cubeAngle += 0.1;
+	}
+	//cube.position.set(8.05, 0.025, 0);
+	
+}
+
+function init() {
+	
+	clock = new THREE.Clock();
+
+	renderer = new THREE.WebGLRenderer();
+	document.body.appendChild (renderer.domElement);
+	var width = window.innerWidth;
+	var height = window.innerHeight;
+	renderer.setSize (width, height);
+	
+	renderer.setClearColor (0xE1C4C4);
+	
+	scene = new THREE.Scene();
+	var grid = new THREE.GridHelper(20,20, 0xaaaa00, 0x333333);
+	scene.add (grid);
+	var axes = new THREE.AxisHelper (5);
+	//scene.add (axes);
+	
+	var directionalLight = new THREE.DirectionalLight(0xffffff, 2);
+	directionalLight.position.set(0, 0, 1).normalize();
+	scene.add(directionalLight);
+	
+	let light = new THREE.PointLight(0xffffff, 4);
+	light.position.set(0, 150, 0);
+	scene.add(light);
+	
+	camera = new THREE.PerspectiveCamera (35, width/height, 1, 1000);
+	camera.position.set (8, 18, 30);
+	camera.lookAt (new THREE.Vector3(0,0,0));
+	
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
+	
+	window.addEventListener('resize', onWindowResize, false);
+	///////////////////////////////////////////////////////////////
+	/*var ground = new THREE.Mesh( new THREE.PlaneGeometry( 20, 20 ), new THREE.MeshBasicMaterial( {color: 0xCF9E9E, side: THREE.DoubleSide} ) );
+	ground.position.y = -0.01;
+	ground.rotation.x = Math.PI/2;
+	scene.add( ground );*/
+	
+	readModel ();
+	makeTrack ();
+  
+}
+
+function onWindowResize() {
+  
+	var width = window.innerWidth;
+	var height = window.innerHeight;
+	camera.aspect = width / height;
+	camera.updateProjectionMatrix();
+	renderer.setSize(width, height);
+	
+}
+
+function animate() {
+	
+	var dt = clock.getDelta();
+	
+	if(turn) angle -= Math.PI/30 * dt * 2;
+	if (train!=undefined){
+		train.position.set(8*Math.cos(angle), 0.75, 8*Math.sin(angle));
+		train.rotation.y = -angle - 3.1415/2;
+	}
+	controls.update()
+	requestAnimationFrame(animate);
+	render();
+}
+
+function render() {
+
+	renderer.render (scene, camera);
+
+}
+</script>
+</body>
+
+</html>
