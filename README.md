@@ -9,4 +9,4 @@
 
 HOMEWORK：
 
-- [hw0](https://zhen9777.github.io/GPhws/hw0.html)
+- [hw0](https://zhen9777.github.io/GPhws/hw0/hw0.html)
