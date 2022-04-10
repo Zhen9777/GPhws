@@ -9,4 +9,5 @@
 
 HOMEWORK：
 
-- [hw0](https://zhen9777.github.io/GPhws/hw0/hw0.html)
+- [hw0 - Thomas the Tank Engine OBJ](https://zhen9777.github.io/GPhws/hw0/hw0.html)
+- [hw1 - Game Physics](https://zhen9777.github.io/GPhws/hw1/hw1.html)
