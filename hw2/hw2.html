@@ -136,19 +136,19 @@ function init() {
 	  
 	lArm = buildArm2(WW/2, HH, WW/2);
 	steve.add (lArm);
-	lArm.position.set (3*WW/4, 1.5*HH, 0);
+	lArm.position.set (3*WW/4, 2*HH, 0);
 
 	lLeg = buildLeg2(WW/2, HH, WW/2);
 	steve.add (lLeg);
-	lLeg.position.set (WW/4, HH/2, 0);
+	lLeg.position.set (WW/4, HH, 0);
 	
 	rArm = buildArm2(WW/2, HH, WW/2);
 	steve.add (rArm);
-	rArm.position.set (-3*WW/4, 1.5*HH, 0);
+	rArm.position.set (-3*WW/4, 2*HH, 0);
 
 	rLeg = buildLeg2(WW/2, HH, WW/2);
 	steve.add (rLeg);
-	rLeg.position.set (-WW/4, HH/2, 0);
+	rLeg.position.set (-WW/4, HH, 0);
 	
 	var axes = new THREE.AxisHelper (10);
 	//scene.add (axes);
@@ -232,7 +232,8 @@ function buildHead2(WW, HH, DD) {
 }
 
 function buildLeg2(WW, HH, DD) {
-
+	
+	let leg = new THREE.Group();
 	var geometry = new THREE.BufferGeometry();	
 	var vertices = [];
 	var indices = [];
@@ -292,13 +293,16 @@ function buildLeg2(WW, HH, DD) {
 	geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 	geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));	
 	
-	let leg = new THREE.Mesh (geometry, new THREE.MeshBasicMaterial({map: texture, side:THREE.DoubleSide}));
+	let mesh = new THREE.Mesh (geometry, new THREE.MeshBasicMaterial({map: texture, side:THREE.DoubleSide}));
+	leg.add(mesh);
+	mesh.position.y = -HH/2;
 	return leg;
 }
 
 
 function buildArm2(WW, HH, DD) {
 
+	let arm = new THREE.Group();
 	var geometry = new THREE.BufferGeometry();	
 	var vertices = [];
 	var indices = [];
@@ -358,7 +362,9 @@ function buildArm2(WW, HH, DD) {
 	geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 	geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));	
 	
-	let arm = new THREE.Mesh (geometry, new THREE.MeshBasicMaterial({map: texture, side:THREE.DoubleSide}));
+	let mesh = new THREE.Mesh (geometry, new THREE.MeshBasicMaterial({map: texture, side:THREE.DoubleSide}));
+	arm.add(mesh);
+	mesh.position.y = -HH/2;
 	return arm;
 }
 
