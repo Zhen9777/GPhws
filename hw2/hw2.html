@@ -65,12 +65,12 @@ var poseWalk0 = {
 	lThigh: Math.PI / 6,
 	rThigh: -Math.PI / 6,
 	lAhigh: -Math.PI / 4,
-	rAhigh: Math.PI / 4
+	rAhigh: Math.PI / 6
 }
 var poseWalk1 = {
 	lThigh: -Math.PI / 6,
 	rThigh: +Math.PI / 6,
-	lAhigh: +Math.PI / 4,
+	lAhigh: +Math.PI / 6,
 	rAhigh: -Math.PI / 4
 }
 var keysWalk = [
@@ -111,14 +111,14 @@ function init() {
 	document.body.appendChild(renderer.domElement);
 
 	camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
-	camera.position.set (0, 180, 180);
+	camera.position.set (0, 280, 350);
 	let controls = new THREE.OrbitControls(camera, renderer.domElement);
 	
 	thirdView = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 10000);
 	
 	window.addEventListener('resize', onWindowResize, false);
 	////////////////////////////////////////////////////////////////
-	var gridXZ = new THREE.GridHelper(200, 20, 'red', 'white');
+	var gridXZ = new THREE.GridHelper(400, 20, 'red', 'white');
 	scene.add(gridXZ);
 	
 	var loader = new THREE.TextureLoader();
@@ -292,8 +292,8 @@ function buildLeg2(WW, HH, DD) {
 	geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 	geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));	
 	
-	let head = new THREE.Mesh (geometry, new THREE.MeshBasicMaterial({map: texture, side:THREE.DoubleSide}));
-	return head;
+	let leg = new THREE.Mesh (geometry, new THREE.MeshBasicMaterial({map: texture, side:THREE.DoubleSide}));
+	return leg;
 }
 
 
@@ -358,8 +358,8 @@ function buildArm2(WW, HH, DD) {
 	geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 	geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));	
 	
-	let head = new THREE.Mesh (geometry, new THREE.MeshBasicMaterial({map: texture, side:THREE.DoubleSide}));
-	return head;
+	let arm = new THREE.Mesh (geometry, new THREE.MeshBasicMaterial({map: texture, side:THREE.DoubleSide}));
+	return arm;
 }
 
 function buildBody2(WW, HH, DD) {
@@ -429,16 +429,6 @@ function buildBody2(WW, HH, DD) {
 	return body;
 }
 
-function buildTorso() {
-	let torso = new THREE.Group();
-	let mesh = new THREE.Mesh (new THREE.BoxGeometry(2*WW,HH,WW), new THREE.MeshNormalMaterial());
-	torso.add (mesh);
-	mesh.position.y = HH/2;
-
-	return torso;
-}
-
-
 
 function animate() {
 
@@ -448,24 +438,20 @@ function animate() {
 	
 	//theta = Math.PI/6
 	
+	if(theta > Math.PI*2){
+		steveDir = !steveDir;
+		theta = 0;
+	}
 	
 	if(steveDir){
 		theta += 0.01;
 		steve.position.set (-80+80*Math.cos(theta), 0, 80*Math.sin(theta));
-		steve.rotation.y = -theta + Math.PI/16;
-		if(steve.rotation.y < 0.005 && steve.rotation.y > - 0.005){
-			steveDir = !steveDir;
-			theta =0.02;
-		}
+		steve.rotation.y = -theta + Math.PI/16;			
 	}
 	else{
 		theta += 0.02;
 		steve.position.set (40-40*Math.cos(theta), 0, 40*Math.sin(theta));
 		steve.rotation.y = theta + Math.PI/16;
-		if(steve.rotation.y > Math.PI/2 -0.005 && steve.rotation.y < Math.PI/2 + 0.005){
-			steveDir = !steveDir;
-			theta =0.01;
-		}
 		
 	}
 	
