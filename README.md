@@ -12,3 +12,4 @@ HOMEWORK：
 - [hw0 - Thomas the Tank Engine OBJ](https://zhen9777.github.io/GPhws/hw0/hw0.html)
 - [hw1 - Game Physics](https://zhen9777.github.io/GPhws/hw1/hw1.html)
 - [hw2 - Character Animation](https://zhen9777.github.io/GPhws/hw2/hw2.html)
+- [hw3 - Applying Character Animation](https://zhen9777.github.io/GPhws/hw3/hw3.html)
